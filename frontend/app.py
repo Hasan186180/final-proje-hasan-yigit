@@ -43,6 +43,18 @@ if dm:
     BTN_TXT     = "#f1f5f9"
     BTN_BG      = "#1e293b"
     BTN_BORDER  = "#334155"
+    
+    # Rozet Renkleri
+    BADGE_YUKSEK_BG  = "rgba(239, 68, 68, 0.2)"
+    BADGE_YUKSEK_TXT = "#ff8787"
+    BADGE_ORTA_BG    = "rgba(245, 158, 11, 0.2)"
+    BADGE_ORTA_TXT   = "#ffd43b"
+    BADGE_DUSUK_BG   = "rgba(16, 185, 129, 0.2)"
+    BADGE_DUSUK_TXT  = "#63e6be"
+    BADGE_TAMAM_BG   = "rgba(2, 132, 199, 0.2)"
+    BADGE_TAMAM_TXT  = "#66d9e8"
+    BADGE_BEKLE_BG   = "rgba(148, 163, 184, 0.2)"
+    BADGE_BEKLE_TXT  = "#c1c9d2"
 else:
     BG     = "#f8fafc"
     BG2    = "#ffffff"
@@ -59,6 +71,18 @@ else:
     BTN_TXT     = "#1e293b"
     BTN_BG      = "#ffffff"
     BTN_BORDER  = "#e2e8f0"
+    
+    # Rozet Renkleri
+    BADGE_YUKSEK_BG  = "#fee2e2"
+    BADGE_YUKSEK_TXT = "#ef4444"
+    BADGE_ORTA_BG    = "#fef3c7"
+    BADGE_ORTA_TXT   = "#d97706"
+    BADGE_DUSUK_BG   = "#d1fae5"
+    BADGE_DUSUK_TXT  = "#059669"
+    BADGE_TAMAM_BG   = "#e0f2fe"
+    BADGE_TAMAM_TXT  = "#0284c7"
+    BADGE_BEKLE_BG   = "#f1f5f9"
+    BADGE_BEKLE_TXT  = "#64748b"
 
 # ── CSS'i JavaScript ile <head>'e enjekte et (Streamlit CSS'inden sonra gelir) ──
 THEME_CSS = f"""
@@ -100,17 +124,17 @@ section[data-testid="stSidebar"] > div:first-child,
 
 /* ===== TÜM METİNLER ===== */
 html body p,
-html body span,
+html body span:not(.badge),
 html body label,
-html body div,
+html body div:not(.badge):not(.stButton),
 html body h1, html body h2, html body h3,
 html body h4, html body h5, html body h6,
 html body li, html body a,
 html body .stMarkdown,
 html body .stMarkdown p,
-html body [data-testid="stMarkdownContainer"],
-html body [data-testid="stMarkdownContainer"] p,
-html body [data-testid="stMarkdownContainer"] span,
+html body [data-testid="stMarkdownContainer"]:not(.badge),
+html body [data-testid="stMarkdownContainer"] p:not(.badge),
+html body [data-testid="stMarkdownContainer"] span:not(.badge),
 html body [data-testid="stMarkdownContainer"] li,
 html body [data-testid="stCaptionContainer"],
 html body [data-testid="stText"] {{
@@ -128,9 +152,16 @@ html body .stButton > button {{
     font-weight: 600 !important;
     transition: all 0.2s ease !important;
 }}
+html body .stButton > button * {{
+    color: inherit !important;
+    background-color: transparent !important;
+}}
 html body .stButton > button:hover {{
     border-color: #6366f1 !important;
     background-color: {BG3} !important;
+    color: {T1} !important;
+}}
+html body .stButton > button:hover * {{
     color: {T1} !important;
 }}
 html body .stButton > button[kind="primary"],
@@ -139,6 +170,10 @@ html body .stButton > button[data-testid="baseButton-primary"] {{
     color: #ffffff !important;
     border: none !important;
     box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+}}
+html body .stButton > button[kind="primary"] *,
+html body .stButton > button[data-testid="baseButton-primary"] * {{
+    color: #ffffff !important;
 }}
 html body .stButton > button[kind="primary"]:hover,
 html body .stButton > button[data-testid="baseButton-primary"]:hover {{
@@ -207,32 +242,28 @@ html body [role="option"][aria-selected="true"] {{
 }}
 
 /* ===== NUMBER INPUT ===== */
-html body [data-testid="stNumberInputContainer"],
-html body [data-testid="stNumberInputContainer"] > div {{
+html body div[data-testid="stNumberInputContainer"] {{
     background-color: {INPUT} !important;
     border-color: {BORDER} !important;
 }}
-/* + ve - stepper butonları */
-html body [data-testid="stNumberInputContainer"] button,
-html body [data-testid="stNumberInput"] button,
-html body .stNumberInput button,
-html body button[data-testid="stNumberInputStepUp"],
-html body button[data-testid="stNumberInputStepDown"] {{
+html body div[data-testid="stNumberInputContainer"] input {{
+    background-color: transparent !important;
+    color: {T1} !important;
+}}
+html body div[data-testid="stNumberInputContainer"] button {{
     background-color: {BG3} !important;
     color: {T1} !important;
-    border-color: {BORDER} !important;
-    border-radius: 6px !important;
+    border: 1px solid {BORDER} !important;
 }}
-html body [data-testid="stNumberInputContainer"] button:hover,
-html body .stNumberInput button:hover {{
+html body div[data-testid="stNumberInputContainer"] button:hover {{
     background-color: {BG2} !important;
-    color: {T1} !important;
     border-color: #6366f1 !important;
 }}
-html body [data-testid="stNumberInputContainer"] button svg,
-html body .stNumberInput button svg {{
+html body div[data-testid="stNumberInputContainer"] button svg,
+html body div[data-testid="stNumberInputContainer"] button svg * {{
     fill: {T1} !important;
     stroke: {T1} !important;
+    color: {T1} !important;
 }}
 
 /* ===== TABS ===== */
@@ -331,15 +362,20 @@ html body hr {{
 .pb-orta   {{ background: linear-gradient(180deg,#f59e0b,#fbbf24); }}
 .pb-dusuk  {{ background: linear-gradient(180deg,#10b981,#34d399); }}
 
-.badge {{
-    font-size: 0.7rem; font-weight: 700; padding: 3px 9px;
-    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px; display: inline-block;
+html body span.badge {{
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    padding: 3px 9px !important;
+    border-radius: 20px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+    display: inline-block !important;
 }}
-.b-yuksek     {{ background:#fee2e2; color:#ef4444 !important; }}
-.b-orta       {{ background:#fef3c7; color:#d97706 !important; }}
-.b-dusuk      {{ background:#d1fae5; color:#059669 !important; }}
-.b-tamamlandi {{ background:#e0f2fe; color:#0284c7 !important; }}
-.b-beklemede  {{ background:#f1f5f9; color:#64748b !important; }}
+html body span.badge.b-yuksek     {{ background-color: {BADGE_YUKSEK_BG} !important; color: {BADGE_YUKSEK_TXT} !important; }}
+html body span.badge.b-orta       {{ background-color: {BADGE_ORTA_BG} !important; color: {BADGE_ORTA_TXT} !important; }}
+html body span.badge.b-dusuk      {{ background-color: {BADGE_DUSUK_BG} !important; color: {BADGE_DUSUK_TXT} !important; }}
+html body span.badge.b-tamamlandi {{ background-color: {BADGE_TAMAM_BG} !important; color: {BADGE_TAMAM_TXT} !important; }}
+html body span.badge.b-beklemede  {{ background-color: {BADGE_BEKLE_BG} !important; color: {BADGE_BEKLE_TXT} !important; }}
 
 .timeline-wrap {{
     background: {BG2} !important;
