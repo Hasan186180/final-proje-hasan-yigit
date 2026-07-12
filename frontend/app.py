@@ -640,8 +640,12 @@ with tab3:
         "Ardından burada talimat girin — AI Agent planı anında güncellesin."
     )
 
-    # Session state başlangıç değeri
+    # Session state başlangıç değerleri
     if "ri" not in st.session_state:
+        st.session_state["ri"] = ""
+
+    # Temizleme bayrağı: başarılı düzenlemeden sonraki çalışmada kutuyu temizle
+    if st.session_state.pop("ri_clear", False):
         st.session_state["ri"] = ""
 
     st.markdown("#### ⚡ Hızlı İşlemler")
@@ -661,12 +665,12 @@ with tab3:
 
     st.markdown("---")
 
-    # Text area — value= KULLANMA, sadece key ile session_state üzerinden çalışır
+    # Text area — sadece key= kullan, value= yok (session_state["ri"] otomatik senkronize)
     st.text_area(
         "Kendi Talimatınızı Yazın",
         placeholder="Örn: 'Rapor yazma görevini iptal et, yerine 30 dakikalık araştırma koy'",
         height=130,
-        key="ri"   # session_state["ri"] ile senkronize — Streamlit bunu otomatik okur/yazar
+        key="ri"
     )
 
     if st.button("🤖  Planı Yeniden Düzenle", type="primary", key="rbtn"):
@@ -684,9 +688,13 @@ with tab3:
                             db.get_all_tasks(), cur, instruction, WorkingHours(**working_hours)
                         )
                         db.save_schedule(new_sch)
-                        st.session_state["ri"] = ""
+                        # Widget render edildikten sonra aynı çalışmada key'i değiştiremeyiz.
+                        # Bir sonraki çalışmada temizlenmesi için bayrak koy, rerun yap.
+                        st.session_state["ri_clear"] = True
                         st.success("Plan güncellendi! 'Günlük Zaman Planı' sekmesinden görebilirsiniz. 🎉")
                         st.balloons()
+                        st.rerun()
                     except Exception as e:
                         st.error(f"Düzenleme Hatası: {e}")
+
 
