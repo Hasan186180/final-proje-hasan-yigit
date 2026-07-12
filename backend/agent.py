@@ -25,34 +25,59 @@ def _call_gemini(system_prompt: str, user_payload: dict) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
 
-    # API anahtarının desteklediği modelleri listeleyip en uygun olanını seçelim
-    model_name = "models/gemini-1.5-flash"
-    try:
-        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        # Tercih sırasına göre modeller
-        for pref in ["models/gemini-1.5-flash", "models/gemini-1.5-flash-latest", "models/gemini-pro", "models/gemini-1.5-pro"]:
-            if pref in available_models:
-                model_name = pref
-                break
-        else:
-            if available_models:
-                model_name = available_models[0]
-    except Exception:
-        # Listeleme sırasında hata olursa varsayılan modele geri dön
-        pass
+    # Güncel Gemini modelleri — tercih sırasına göre (yeniden eskiye)
+    PREFERRED_MODELS = [
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro",
+    ]
 
-    model = genai.GenerativeModel(
-        model_name=model_name,
-        system_instruction=system_prompt,
-        generation_config=genai.GenerationConfig(
-            response_mime_type="application/json",
-            temperature=0.3,
-        )
-    )
+    # Önce API'den mevcut modelleri almayı dene
+    try:
+        available = {
+            m.name.replace("models/", "")
+            for m in genai.list_models()
+            if "generateContent" in m.supported_generation_methods
+        }
+        # Tercih listesinden ilk mevcut olanı seç
+        selected = next((m for m in PREFERRED_MODELS if m in available), None)
+        if selected is None and available:
+            selected = next(iter(available))  # İlk mevcut model
+        model_name = selected or PREFERRED_MODELS[0]
+    except Exception:
+        # list_models başarısız olursa listeyi deneme sırasına koy
+        model_name = None
 
     user_content = json.dumps(user_payload, ensure_ascii=False, indent=2)
-    response = model.generate_content(user_content)
-    return _extract_json(response.text)
+
+    # model_name belirlendiyse doğrudan dene, değilse listeyi sırayla dene
+    candidates = [model_name] if model_name else PREFERRED_MODELS
+
+    last_error = None
+    for candidate in candidates:
+        try:
+            model = genai.GenerativeModel(
+                model_name=candidate,
+                system_instruction=system_prompt,
+                generation_config=genai.GenerationConfig(
+                    response_mime_type="application/json",
+                    temperature=0.3,
+                )
+            )
+            response = model.generate_content(user_content)
+            return _extract_json(response.text)
+        except Exception as e:
+            last_error = e
+            continue  # Bir sonraki modeli dene
+
+    raise RuntimeError(
+        f"Hiçbir Gemini modeli çalışmadı. Son hata: {last_error}\n"
+        f"İpucu: GEMINI_API_KEY'inizin geçerli ve aktif olduğundan emin olun."
+    )
 
 
 def _call_groq(system_prompt: str, user_payload: dict) -> dict:
