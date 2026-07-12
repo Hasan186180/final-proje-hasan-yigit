@@ -635,33 +635,44 @@ with tab2:
 # ════════ SEKME 3 ════════════════════════════════════════════════════════════
 with tab3:
     st.markdown("### 🔮 AI Asistan ile Planı Yeniden Düzenle")
-    st.markdown("Gün içinde bir şey değişti mi? Aşağıya yazın, AI Agent planı anında güncellesin.")
+    st.markdown(
+        "Önce **'Günlük Zaman Planı'** sekmesinden bir plan oluşturun. "
+        "Ardından burada talimat girin — AI Agent planı anında güncellesin."
+    )
+
+    # Session state başlangıç değeri
+    if "ri" not in st.session_state:
+        st.session_state["ri"] = ""
 
     st.markdown("#### ⚡ Hızlı İşlemler")
     qc1, qc2, qc3 = st.columns(3)
-    quick = None
     with qc1:
         if st.button("🕒 30 Dak. Geciktim", use_container_width=True, key="q1"):
-            quick = "Tüm kalan planı 30 dakika ileri kaydır."
+            st.session_state["ri"] = "Tüm kalan planı 30 dakika ileri kaydır."
+            st.rerun()
     with qc2:
         if st.button("🚨 Acil Toplantı (14:00)", use_container_width=True, key="q2"):
-            quick = "Saat 14:00'e 45 dakikalık acil 'Müşteri Değerlendirme Toplantısı' ekle ve planı güncelle."
+            st.session_state["ri"] = "Saat 14:00'e 45 dakikalık acil 'Müşteri Değerlendirme Toplantısı' ekle ve planı güncelle."
+            st.rerun()
     with qc3:
         if st.button("☕ Kahve Molası (15:30)", use_container_width=True, key="q3"):
-            quick = "Saat 15:30'a 20 dakikalık kahve molası ekle, sonraki görevleri kaydır."
-
-    if quick:
-        st.session_state["ri"] = quick
+            st.session_state["ri"] = "Saat 15:30'a 20 dakikalık kahve molası ekle, sonraki görevleri kaydır."
+            st.rerun()
 
     st.markdown("---")
-    instruction = st.text_area("Kendi Talimatınızı Yazın",
-        value=st.session_state.get("ri",""),
+
+    # Text area — value= KULLANMA, sadece key ile session_state üzerinden çalışır
+    st.text_area(
+        "Kendi Talimatınızı Yazın",
         placeholder="Örn: 'Rapor yazma görevini iptal et, yerine 30 dakikalık araştırma koy'",
-        height=120, key="rta")
+        height=130,
+        key="ri"   # session_state["ri"] ile senkronize — Streamlit bunu otomatik okur/yazar
+    )
 
     if st.button("🤖  Planı Yeniden Düzenle", type="primary", key="rbtn"):
-        if not instruction.strip():
-            st.error("Lütfen bir talimat girin.")
+        instruction = st.session_state.get("ri", "").strip()
+        if not instruction:
+            st.error("Lütfen bir talimat girin veya hızlı işlemlerden birini seçin.")
         else:
             cur = db.get_schedule()
             if not cur.slots:
@@ -678,3 +689,4 @@ with tab3:
                         st.balloons()
                     except Exception as e:
                         st.error(f"Düzenleme Hatası: {e}")
+
