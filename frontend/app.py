@@ -498,7 +498,7 @@ with tab1:
         title    = st.text_input("Görev Başlığı *", placeholder="Rapor yaz, Toplantı hazırla…", key="nt")
         desc     = st.text_area("Açıklama (İsteğe Bağlı)", placeholder="Detaylar…", key="nd")
     with c2:
-        duration = st.number_input("Mola / Görev Süresi (Dakika)", min_value=5, max_value=480, value=30, step=5, key="ndur")
+        duration = st.number_input("Görev Süresi (Dakika)", min_value=5, max_value=480, value=30, step=5, key="ndur")
         priority = st.selectbox("Önem Derecesi", ["yuksek","orta","dusuk"],
             format_func=lambda x: {"yuksek":"🔴 Yüksek","orta":"🟡 Orta","dusuk":"🟢 Düşük"}[x], key="np")
         deadline = st.text_input("Son Teslim Saati", placeholder="17:00", key="ndl")
