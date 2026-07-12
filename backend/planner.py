@@ -106,6 +106,11 @@ def save_schedule(schedule: Schedule):
     db["schedule"] = schedule.model_dump()
     save_db(db)
 
+def save_all_tasks(tasks: List[Task]):
+    db = load_db()
+    db["tasks"] = [t.model_dump() for t in tasks]
+    save_db(db)
+
 def reset_db():
     default_db = {
         "tasks": [],

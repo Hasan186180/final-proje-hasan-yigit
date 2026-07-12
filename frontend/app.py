@@ -212,14 +212,17 @@ html body [data-baseweb="textarea"] {{
 }}
 
 /* ===== SELECTBOX ===== */
-html body div[data-testid="stSelectbox"] div[data-baseweb="select"] {{
+html body div[data-testid="stSelectbox"],
+html body div[data-testid="stSelectbox"] *,
+html body div[data-testid="stSelectbox"] div,
+html body div[data-testid="stSelectbox"] span,
+html body .stSelectbox,
+html body .stSelectbox *,
+html body .stSelectbox div,
+html body .stSelectbox span {{
     background-color: {INPUT} !important;
-    border-color: {BORDER} !important;
-    border-radius: 8px !important;
-}}
-html body div[data-testid="stSelectbox"] div[data-baseweb="select"] * {{
-    background-color: transparent !important;
     color: {T1} !important;
+    border-color: {BORDER} !important;
 }}
 /* Dropdown popup listesi */
 html body [data-baseweb="popover"],
@@ -684,14 +687,15 @@ with tab3:
             else:
                 with st.spinner("AI Agent planı yeniden düzenliyor…"):
                     try:
-                        new_sch = agent.rearrange_schedule(
+                        new_sch, updated_tasks = agent.rearrange_schedule(
                             db.get_all_tasks(), cur, instruction, WorkingHours(**working_hours)
                         )
                         db.save_schedule(new_sch)
+                        db.save_all_tasks(updated_tasks)
                         # Widget render edildikten sonra aynı çalışmada key'i değiştiremeyiz.
                         # Bir sonraki çalışmada temizlenmesi için bayrak koy, rerun yap.
                         st.session_state["ri_clear"] = True
-                        st.success("Plan güncellendi! 'Günlük Zaman Planı' sekmesinden görebilirsiniz. 🎉")
+                        st.success("Plan ve görevler güncellendi! Değişiklikleri sekmelerden görebilirsiniz. 🎉")
                         st.balloons()
                         st.rerun()
                     except Exception as e:

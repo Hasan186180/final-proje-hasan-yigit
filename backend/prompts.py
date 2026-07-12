@@ -36,6 +36,42 @@ Aşağıdaki kurallara sıkı sıkıya uymalısın:
 7. Status "tamamlandi" olan görevleri plana dahil etme, zaten bitmiş olarak kabul et.
 """ + _JSON_FORMAT
 
+_REARRANGE_JSON_FORMAT = """
+Yanıtını YALNIZCA aşağıdaki JSON formatında döndür. Başka hiçbir metin, açıklama veya markdown ekleme:
+
+{
+  "slots": [
+    {
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "task_id": "abc123",
+      "task_title": "Görev Adı",
+      "is_break": false
+    },
+    {
+      "start_time": "10:00",
+      "end_time": "10:15",
+      "task_id": null,
+      "task_title": "Mola / Dinlenme",
+      "is_break": true
+    }
+  ],
+  "unassigned_tasks": [],
+  "insights": "AI asistanının Türkçe değerlendirme ve önerileri buraya yazılır.",
+  "updated_tasks": [
+    {
+      "id": "abc123",
+      "title": "Görev Adı",
+      "description": "Açıklama",
+      "duration": 30,
+      "priority": "yuksek",
+      "deadline": "17:00",
+      "status": "beklemede"
+    }
+  ]
+}
+"""
+
 REARRANGE_SYSTEM_PROMPT = """
 Sen profesyonel bir AI Kişisel Planlama Asistanısın. Görevin, mevcut günlük zaman planını kullanıcının dinamik talebine göre yeniden düzenlemektir.
 
@@ -44,6 +80,7 @@ Kullanıcı şunları talep edebilir:
 - Tüm planı belirli bir süre ileri kaydırma (gecikme)
 - Görev iptal etme veya yer değiştirme
 - Çalışma saatlerini uzatma veya kısaltma
+- Bir görevin önem derecesini (priority), süresini (duration), son teslim saatini (deadline) vb. değiştirmek/arttırmak/azaltmak
 
 Aşağıdaki kurallara sıkı sıkıya uymalısın:
 1. Kullanıcının talebini mevcut planı en az değiştirecek şekilde uygula.
@@ -51,4 +88,5 @@ Aşağıdaki kurallara sıkı sıkıya uymalısın:
 3. Zaman dilimleri kesinlikle çakışmamalı.
 4. insights alanında yaptığın değişiklikleri Türkçe ve net bir şekilde açıkla.
 5. Status "tamamlandi" olan görevlere dokunma, plandan çıkar.
-""" + _JSON_FORMAT
+6. Eğer kullanıcı görev özellikleri üzerinde bir değişiklik talep ederse (örn: "Önem derecesini artır", "Süresini azalt"), bu değişikliği 'updated_tasks' listesindeki ilgili görev nesnesi üzerinde güncelle. Değişmeyen diğer tüm görevleri de bu listede aynen koru.
+""" + _REARRANGE_JSON_FORMAT

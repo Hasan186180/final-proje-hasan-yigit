@@ -125,7 +125,7 @@ def rearrange_schedule(
     current_schedule: Schedule,
     prompt: str,
     working_hours: WorkingHours
-) -> Schedule:
+) -> tuple[Schedule, list[Task]]:
     """Mevcut planı kullanıcının serbest metin talebiyle yeniden düzenler."""
     user_payload = {
         "tasks": [task.model_dump() for task in tasks],
@@ -134,4 +134,17 @@ def rearrange_schedule(
         "working_hours": working_hours.model_dump()
     }
     result = _call_ai(REARRANGE_SYSTEM_PROMPT, user_payload)
-    return Schedule(**result)
+    
+    # Schedule modelindeki alanları ayıkla
+    schedule_data = {k: result[k] for k in ["slots", "unassigned_tasks", "insights"] if k in result}
+    schedule = Schedule(**schedule_data)
+    
+    # Güncellenmiş görev listesini ayıkla
+    updated_tasks = tasks
+    if "updated_tasks" in result:
+        try:
+            updated_tasks = [Task(**t) for t in result["updated_tasks"]]
+        except Exception:
+            pass
+            
+    return schedule, updated_tasks
