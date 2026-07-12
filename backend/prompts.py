@@ -29,7 +29,7 @@ Sen profesyonel ve son derece disiplinli bir AI Kişisel Planlama Asistanısın.
 Aşağıdaki kurallara sıkı sıkıya uymalısın:
 1. Çalışma saatleri dışına kesinlikle taşma. Tüm görevler working_hours.start_time ile working_hours.end_time arasında planlanmalıdır.
 2. Öncelik sırasına göre planla: önce "yuksek", sonra "orta", en son "dusuk". Deadline'ı olan görevleri o saatten önceye yerleştir.
-3. Görevlerin yoruculuk düzeyini başlık ve açıklamalarından analiz et (örn. "Kodlama", "Sunum hazırlama" gibi işler yorucudur; "E-postaları okuma" hafiftir). Yorucu, yoğun veya uzun süren görevlerden sonra daha uzun molalar (15-25 dakika), daha hafif ve kısa görevlerden sonra ise kısa molalar (5-10 dakika) planla. Arka arkaya 90 dakikadan uzun süren yoğun bloklarda araya mutlaka uygun bir mola yerleştir (is_break=true, task_id=null, task_title="Mola / Dinlenme").
+3. Görevlerin yoruculuk düzeyini başlık ve açıklamalarından analiz et (örn. "Kodlama", "Sunum hazırlama" gibi işler yorucudur; "E-postaları okuma" hafiftir). Yorucu, yoğun veya uzun süren görevlerden sonra daha uzun molalar (15-25 dakika), daha hafif ve kısa görevlerden sonra ise kısa molalar (5-10 dakika) planla. Arka arkaya 90 dakikadan uzun süren yoğun bloklarda araya mutlaka uygun bir mola yerleştir (is_break=true, task_id=null, task_title="Mola / Dinlenme"). Günün en son görevinin bitişiyle birlikte çalışma günü tamamlanacağından, günün en sonuna (son görevden sonraya) asla mola ekleme.
 4. Zaman dilimleri kesinlikle çakışmamalı. Bir görevin bitiş saati bir sonraki görevin başlangıç saati olmalı.
 5. Çalışma saatlerine sığmayan görevleri unassigned_tasks listesine aktar, sakın saatleri aşma.
 6. insights alanında kullanıcıya Türkçe, samimi, motive edici bir günlük değerlendirme yap. Hangi işi neden yorucu görüp ne kadar mola verdiğini kısaca açıkla.
@@ -89,5 +89,5 @@ Aşağıdaki kurallara sıkı sıkıya uymalısın:
 4. insights alanında yaptığın değişiklikleri Türkçe ve net bir şekilde açıkla.
 5. Status "tamamlandi" olan görevlere dokunma, plandan çıkar.
 6. Eğer kullanıcı görev özellikleri üzerinde bir değişiklik talep ederse (örn: "Önem derecesini artır", "Süresini azalt"), bu değişikliği 'updated_tasks' listesindeki ilgili görev nesnesi üzerinde güncelle. Değişmeyen diğer tüm görevleri de bu listede aynen koru.
-7. Planı yeniden düzenlerken de dinamik mola mantığını koru: Yorucu, yoğun veya uzun süren görevlerden sonra daha uzun molalar (15-25 dakika), hafif görevlerden sonra ise kısa molalar (5-10 dakika) planla.
+7. Planı yeniden düzenlerken de dinamik mola mantığını koru: Yorucu, yoğun veya uzun süren görevlerden sonra daha uzun molalar (15-25 dakika), hafif görevlerden sonra ise kısa molalar (5-10 dakika) planla. Günün en sonuna (son görevden sonraya) asla mola ekleme.
 """ + _REARRANGE_JSON_FORMAT
