@@ -117,7 +117,15 @@ def generate_schedule(tasks: list[Task], working_hours: WorkingHours) -> Schedul
         "working_hours": working_hours.model_dump()
     }
     result = _call_ai(PLANNER_SYSTEM_PROMPT, user_payload)
-    return Schedule(**result)
+    schedule = Schedule(**result)
+    
+    # Günün sonundaki mola slotlarını temizle
+    slots = list(schedule.slots)
+    while slots and slots[-1].is_break:
+        slots.pop()
+    schedule.slots = slots
+    
+    return schedule
 
 
 def rearrange_schedule(
@@ -138,6 +146,12 @@ def rearrange_schedule(
     # Schedule modelindeki alanları ayıkla
     schedule_data = {k: result[k] for k in ["slots", "unassigned_tasks", "insights"] if k in result}
     schedule = Schedule(**schedule_data)
+    
+    # Günün sonundaki mola slotlarını temizle
+    slots = list(schedule.slots)
+    while slots and slots[-1].is_break:
+        slots.pop()
+    schedule.slots = slots
     
     # Güncellenmiş görev listesini ayıkla
     updated_tasks = tasks
