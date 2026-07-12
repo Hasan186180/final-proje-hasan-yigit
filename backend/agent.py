@@ -25,8 +25,24 @@ def _call_gemini(system_prompt: str, user_payload: dict) -> dict:
     import google.generativeai as genai
     genai.configure(api_key=GEMINI_API_KEY)
 
+    # API anahtarının desteklediği modelleri listeleyip en uygun olanını seçelim
+    model_name = "models/gemini-1.5-flash"
+    try:
+        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        # Tercih sırasına göre modeller
+        for pref in ["models/gemini-1.5-flash", "models/gemini-1.5-flash-latest", "models/gemini-pro", "models/gemini-1.5-pro"]:
+            if pref in available_models:
+                model_name = pref
+                break
+        else:
+            if available_models:
+                model_name = available_models[0]
+    except Exception:
+        # Listeleme sırasında hata olursa varsayılan modele geri dön
+        pass
+
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name=model_name,
         system_instruction=system_prompt,
         generation_config=genai.GenerationConfig(
             response_mime_type="application/json",
